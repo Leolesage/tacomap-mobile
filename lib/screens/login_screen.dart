@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../state/auth_provider.dart';
 import '../theme/app_theme.dart';
@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Color(0xFFF7F3EC), Color(0xFFF2ECE4)],
+                    colors: [Color(0xFFEFF5F8), Color(0xFFE7F0F7)],
                   ),
                 ),
               ),

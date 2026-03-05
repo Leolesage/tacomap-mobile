@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../models/tacos_place.dart';
 import '../theme/app_theme.dart';
 import 'resilient_network_image.dart';
@@ -158,7 +158,7 @@ class TacosPlaceCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF3E4D2), Color(0xFFE8D2B2)],
+          colors: [Color(0xFFE3EEF5), Color(0xFFD6E4EE)],
         ),
       ),
       alignment: Alignment.center,

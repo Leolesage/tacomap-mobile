@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primary = Color(0xFFE85D2A);
-  static const Color primaryDark = Color(0xFFCA491D);
-  static const Color dark = Color(0xFF161922);
-  static const Color surface = Color(0xFFF5F3EE);
+  static const Color primary = Color(0xFF0F766E);
+  static const Color primaryDark = Color(0xFF0B5D57);
+  static const Color dark = Color(0xFF111827);
+  static const Color surface = Color(0xFFF1F5F9);
   static const Color cardSurface = Color(0xFFFFFFFF);
-  static const Color textPrimary = Color(0xFF181A24);
-  static const Color textMuted = Color(0xFF6B7280);
-  static const Color border = Color(0xFFE3DED6);
-  static const Color success = Color(0xFF1F8A70);
-  static const Color danger = Color(0xFFD64545);
-  static const Color navy = Color(0xFF232A3E);
-  static const Color sun = Color(0xFFF8B650);
-  static const Color mist = Color(0xFFFDFBF7);
+  static const Color textPrimary = Color(0xFF0F172A);
+  static const Color textMuted = Color(0xFF64748B);
+  static const Color border = Color(0xFFD8E0EA);
+  static const Color success = Color(0xFF059669);
+  static const Color danger = Color(0xFFDC2626);
+  static const Color navy = Color(0xFF1E293B);
+  static const Color sun = Color(0xFF22C55E);
+  static const Color mist = Color(0xFFF8FAFC);
 
   static const LinearGradient heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFFF58A3A), Color(0xFFE85D2A), Color(0xFFCE3B24)],
+    colors: [Color(0xFF0F766E), Color(0xFF0D9488), Color(0xFF155E75)],
   );
 
   static ThemeData theme() {

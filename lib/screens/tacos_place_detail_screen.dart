@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/tacos_place_service.dart';
 import '../models/tacos_place.dart';
@@ -234,7 +234,7 @@ class _HeroPhoto extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF3E7D9), Color(0xFFE7D6C0)],
+          colors: [Color(0xFFE3EEF5), Color(0xFFD6E4EE)],
         ),
       ),
       alignment: Alignment.center,

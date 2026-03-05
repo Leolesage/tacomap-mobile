@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../config/api_config.dart';
 import '../theme/app_theme.dart';
@@ -45,7 +45,7 @@ class _ResilientNetworkImageState extends State<ResilientNetworkImage> {
       imageUrl: currentUrl,
       fit: widget.fit,
       placeholder: (context, url) => Container(
-        color: const Color(0xFFEFEAE2),
+        color: const Color(0xFFE5EEF5),
         alignment: Alignment.center,
         child: const SizedBox(
           width: 22,
