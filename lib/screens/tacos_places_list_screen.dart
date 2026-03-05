@@ -72,18 +72,15 @@ class _TacosPlacesListScreenState extends State<TacosPlacesListScreen> {
     return Scaffold(
       backgroundColor: AppTheme.surface,
       appBar: AppBar(
-        title: Text(widget.isAdmin ? 'Admin - Tacos Places' : 'Tacos Places'),
+        title: Text(widget.isAdmin ? 'Espace admin' : 'TacoMap France'),
         actions: [
           if (widget.isAdmin)
             Consumer<AuthProvider>(
               builder: (context, auth, _) {
-                return TextButton.icon(
+                return IconButton(
+                  tooltip: 'Se deconnecter',
                   onPressed: () => auth.logout(),
-                  icon: const Icon(Icons.logout, size: 18, color: Colors.white),
-                  label: const Text(
-                    'Logout',
-                    style: TextStyle(color: Colors.white, fontSize: 13),
-                  ),
+                  icon: const Icon(Icons.logout_rounded),
                 );
               },
             ),
@@ -92,17 +89,14 @@ class _TacosPlacesListScreenState extends State<TacosPlacesListScreen> {
       floatingActionButton: widget.isAdmin
           ? FloatingActionButton.extended(
               onPressed: _openCreate,
-              icon: const Icon(Icons.add),
-              label: const Text(
-                'Add TacosPlace',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Ajouter un lieu'),
             )
           : null,
       body: Consumer<TacosPlacesProvider>(
         builder: (context, provider, _) {
           if (provider.isLoading && provider.items.isEmpty) {
-            return const AppLoader(message: 'Loading tacos places...');
+            return const AppLoader(message: 'Chargement des adresses tacos');
           }
 
           if (provider.error != null && provider.items.isEmpty) {
@@ -112,22 +106,33 @@ class _TacosPlacesListScreenState extends State<TacosPlacesListScreen> {
             );
           }
 
+          final itemCount = provider.items.length + 2;
+
           return RefreshIndicator(
             color: AppTheme.primary,
+            backgroundColor: Colors.white,
             onRefresh: provider.refresh,
             child: ListView.builder(
               controller: _controller,
-              padding: const EdgeInsets.only(top: 8, bottom: 80),
-              itemCount: provider.items.length + 1,
+              padding: const EdgeInsets.only(bottom: 90),
+              itemCount: itemCount,
               itemBuilder: (context, index) {
-                if (index < provider.items.length) {
-                  final item = provider.items[index];
+                if (index == 0) {
+                  return _HeroHeader(
+                    totalLoaded: provider.items.length,
+                    isAdmin: widget.isAdmin,
+                  );
+                }
+
+                if (index <= provider.items.length) {
+                  final item = provider.items[index - 1];
                   return TacosPlaceCard(
                     item: item,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => TacosPlaceDetailScreen(tacosPlaceId: item.id),
+                        builder: (_) =>
+                            TacosPlaceDetailScreen(tacosPlaceId: item.id),
                       ),
                     ),
                   );
@@ -135,20 +140,26 @@ class _TacosPlacesListScreenState extends State<TacosPlacesListScreen> {
 
                 if (provider.isLoadingMore) {
                   return const Padding(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.symmetric(vertical: 20),
                     child: Center(
-                      child: CircularProgressIndicator(color: AppTheme.primary),
+                      child: SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2.6, color: AppTheme.primary),
+                      ),
                     ),
                   );
                 }
 
                 if (!provider.hasMore) {
                   return const Padding(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.symmetric(vertical: 14),
                     child: Center(
                       child: Text(
-                        'No more results.',
-                        style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                        'Fin de la liste',
+                        style: TextStyle(
+                            color: AppTheme.textMuted, fontSize: 12.5),
                       ),
                     ),
                   );
@@ -159,6 +170,101 @@ class _TacosPlacesListScreenState extends State<TacosPlacesListScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _HeroHeader extends StatelessWidget {
+  final int totalLoaded;
+  final bool isAdmin;
+
+  const _HeroHeader({required this.totalLoaded, required this.isAdmin});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: AppTheme.heroGradient,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.14),
+            blurRadius: 26,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.22),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.lunch_dining, color: Colors.white),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    isAdmin
+                        ? 'Gestion des TacosPlace'
+                        : 'Adresses tacos en France',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      height: 1.2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _badge(Icons.pin_drop_outlined, '$totalLoaded lieux charges'),
+                _badge(Icons.swipe_down_alt_outlined, 'Tirer pour rafraichir'),
+                if (isAdmin)
+                  _badge(Icons.admin_panel_settings_outlined, 'Mode admin'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _badge(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 14),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600),
+          ),
+        ],
       ),
     );
   }

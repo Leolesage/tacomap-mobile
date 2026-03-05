@@ -37,69 +37,74 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       return;
     }
-    if (auth.isAuthenticated && widget.popOnSuccess) {
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context, true);
-      }
+
+    if (auth.isAuthenticated &&
+        widget.popOnSuccess &&
+        Navigator.canPop(context)) {
+      Navigator.pop(context, true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.surface,
       body: Consumer<AuthProvider>(
         builder: (context, auth, _) {
           if (auth.isLoading) {
-            return const AppLoader(message: 'Signing in...');
+            return const AppLoader(message: 'Connexion en cours');
           }
 
-          return SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Column(
-                      children: [
-                        Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            color: AppTheme.primary,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Icon(Icons.restaurant, color: Colors.white, size: 36),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'TACOMAP FRANCE',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.primary,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Admin login',
-                          style: TextStyle(fontSize: 14, color: AppTheme.textMuted),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 28),
-                    Container(
-                      padding: const EdgeInsets.all(24),
+          return Stack(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFFF7F3EC), Color(0xFFF2ECE4)],
+                  ),
+                ),
+              ),
+              Positioned(
+                top: -120,
+                right: -30,
+                child: Container(
+                  width: 260,
+                  height: 260,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: -140,
+                left: -40,
+                child: Container(
+                  width: 260,
+                  height: 260,
+                  decoration: BoxDecoration(
+                    color: AppTheme.sun.withValues(alpha: 0.16),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              SafeArea(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 460),
+                      padding: const EdgeInsets.all(22),
                       decoration: BoxDecoration(
-                        color: AppTheme.cardSurface,
-                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(26),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.06),
-                            blurRadius: 24,
-                            offset: const Offset(0, 4),
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 28,
+                            offset: const Offset(0, 14),
                           ),
                         ],
                       ),
@@ -108,77 +113,101 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const Text(
-                              'Sign in',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: AppTheme.textPrimary,
-                              ),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 54,
+                                  height: 54,
+                                  decoration: BoxDecoration(
+                                    gradient: AppTheme.heroGradient,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: const Icon(
+                                      Icons.admin_panel_settings_rounded,
+                                      color: Colors.white,
+                                      size: 28),
+                                ),
+                                const SizedBox(width: 12),
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Espace Admin',
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.w800,
+                                          color: AppTheme.textPrimary,
+                                        ),
+                                      ),
+                                      SizedBox(height: 2),
+                                      Text(
+                                        'Connectez-vous pour gerer TacoMap',
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            color: AppTheme.textMuted),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 20),
-                            const Text(
-                              'Email',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 24),
                             TextFormField(
                               controller: _emailController,
-                              decoration: const InputDecoration(
-                                hintText: 'admin@tacomap.local',
-                                prefixIcon: Icon(Icons.email_outlined, size: 18, color: AppTheme.textMuted),
-                              ),
                               keyboardType: TextInputType.emailAddress,
+                              decoration: const InputDecoration(
+                                labelText: 'Email admin',
+                                prefixIcon:
+                                    Icon(Icons.email_outlined, size: 18),
+                              ),
                               validator: (value) {
-                                if (value == null || value.isEmpty) return 'Email required.';
-                                if (!value.contains('@')) return 'Invalid email.';
+                                if (value == null || value.isEmpty) {
+                                  return 'Email requis';
+                                }
+                                if (!value.contains('@')) {
+                                  return 'Email invalide';
+                                }
                                 return null;
                               },
                             ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Password',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 14),
                             TextFormField(
                               controller: _passwordController,
-                              decoration: const InputDecoration(
-                                hintText: 'Password123!',
-                                prefixIcon: Icon(Icons.lock_outline, size: 18, color: AppTheme.textMuted),
-                              ),
                               obscureText: true,
+                              decoration: const InputDecoration(
+                                labelText: 'Mot de passe',
+                                prefixIcon: Icon(Icons.lock_outline, size: 18),
+                              ),
                               validator: (value) =>
-                                  (value == null || value.isEmpty) ? 'Password required.' : null,
+                                  (value == null || value.isEmpty)
+                                      ? 'Mot de passe requis'
+                                      : null,
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 18),
                             SizedBox(
-                              height: 46,
+                              height: 48,
                               child: ElevatedButton(
                                 onPressed: _submit,
-                                child: const Text('Login'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.primary,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('Se connecter'),
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            ],
           );
         },
       ),
     );
   }
 }
-

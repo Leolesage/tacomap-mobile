@@ -30,7 +30,8 @@ void main() {
         Provider.value(value: tacosPlaceService),
         Provider.value(value: locationService),
         ChangeNotifierProvider(
-          create: (_) => TacosPlacesProvider(tacosPlaceService: tacosPlaceService),
+          create: (_) =>
+              TacosPlacesProvider(tacosPlaceService: tacosPlaceService),
         ),
         ChangeNotifierProvider(
           create: (context) => AuthProvider(
@@ -106,19 +107,37 @@ class _HomeShellState extends State<HomeShell> {
 
     return Scaffold(
       body: IndexedStack(index: _index, children: pages),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _index,
-        onTap: (i) => setState(() => _index = i),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Tacos',
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 22,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.admin_panel_settings),
-            label: 'Admin',
+          child: NavigationBar(
+            selectedIndex: _index,
+            onDestinationSelected: (i) => setState(() => _index = i),
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.lunch_dining_outlined),
+                selectedIcon: Icon(Icons.lunch_dining),
+                label: 'Tacos',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.admin_panel_settings_outlined),
+                selectedIcon: Icon(Icons.admin_panel_settings),
+                label: 'Admin',
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

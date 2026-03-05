@@ -32,7 +32,9 @@ class TacosPlace {
   });
 
   factory TacosPlace.fromJson(Map<String, dynamic> json) {
-    final rawPhoto = (json['photo_url'] ?? '').toString();
+    final rawPhotoUrl = (json['photo_url'] ?? '').toString();
+    final rawPhotoPath = (json['photo'] ?? '').toString();
+
     return TacosPlace(
       id: (json['id'] as num? ?? 0).toInt(),
       name: (json['name'] ?? '').toString(),
@@ -43,36 +45,65 @@ class TacosPlace {
       longitude: (json['longitude'] as num? ?? 0).toDouble(),
       contactName: (json['contact_name'] ?? '').toString(),
       contactEmail: (json['contact_email'] ?? '').toString(),
-      photo: (json['photo'] ?? '').toString(),
-      photoUrl: _normalizePhotoUrl(rawPhoto),
+      photo: rawPhotoPath,
+      photoUrl: _resolvePhotoUrl(rawPhotoUrl, rawPhotoPath),
       createdAt: (json['created_at'] ?? '').toString(),
       updatedAt: (json['updated_at'] ?? '').toString(),
     );
   }
 
-  static String _normalizePhotoUrl(String raw) {
-    if (raw.isEmpty) return '';
-
-    // If API returned a relative path, prefix with baseUrl.
-    if (raw.startsWith('/')) {
-      return '${ApiConfig.baseUrl}$raw';
-    }
-    if (raw.startsWith('uploads/')) {
-      return '${ApiConfig.baseUrl}/$raw';
+  static String _resolvePhotoUrl(String photoUrl, String photoPath) {
+    final byPhotoUrl = _normalizeToApiBase(photoUrl);
+    if (byPhotoUrl.isNotEmpty) {
+      return byPhotoUrl;
     }
 
-    // If API returned localhost in container, rewrite to mobile baseUrl.
-    try {
-      final uri = Uri.parse(raw);
-      if (uri.host == 'localhost' ||
-          uri.host == '127.0.0.1' ||
-          uri.host == '0.0.0.0') {
-        final path = uri.path;
-        return '${ApiConfig.baseUrl}$path';
+    final byPhotoPath = _normalizeToApiBase(photoPath);
+    if (byPhotoPath.isNotEmpty) {
+      return byPhotoPath;
+    }
+
+    return '';
+  }
+
+  static String _normalizeToApiBase(String raw) {
+    final value = raw.trim();
+    if (value.isEmpty) return '';
+
+    if (value.startsWith('uploads/')) {
+      return '${ApiConfig.baseUrl}/$value';
+    }
+
+    if (value.startsWith('/uploads/')) {
+      return '${ApiConfig.baseUrl}$value';
+    }
+
+    final uri = Uri.tryParse(value);
+    if (uri != null && uri.hasScheme && uri.host.isNotEmpty) {
+      final normalizedPath =
+          uri.path.startsWith('/') ? uri.path : '/${uri.path}';
+      final query = uri.hasQuery ? '?${uri.query}' : '';
+
+      if (normalizedPath.startsWith('/uploads/')) {
+        return '${ApiConfig.baseUrl}$normalizedPath$query';
       }
-    } catch (_) {}
 
-    return raw;
+      final localHost = uri.host == 'localhost' ||
+          uri.host == '127.0.0.1' ||
+          uri.host == '0.0.0.0';
+      final dockerHost = !uri.host.contains('.') || uri.host.endsWith('.local');
+      if (localHost || dockerHost) {
+        return '${ApiConfig.baseUrl}$normalizedPath$query';
+      }
+
+      return value;
+    }
+
+    if (value.startsWith('/')) {
+      return '${ApiConfig.baseUrl}$value';
+    }
+
+    return '${ApiConfig.baseUrl}/$value';
   }
 }
 
