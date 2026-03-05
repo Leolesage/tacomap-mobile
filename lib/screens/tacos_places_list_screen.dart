@@ -119,7 +119,6 @@ class _TacosPlacesListScreenState extends State<TacosPlacesListScreen> {
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return _HeroHeader(
-                    totalLoaded: provider.items.length,
                     isAdmin: widget.isAdmin,
                   );
                 }
@@ -176,10 +175,9 @@ class _TacosPlacesListScreenState extends State<TacosPlacesListScreen> {
 }
 
 class _HeroHeader extends StatelessWidget {
-  final int totalLoaded;
   final bool isAdmin;
 
-  const _HeroHeader({required this.totalLoaded, required this.isAdmin});
+  const _HeroHeader({required this.isAdmin});
 
   @override
   Widget build(BuildContext context) {
@@ -228,43 +226,19 @@ class _HeroHeader extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 14),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _badge(Icons.pin_drop_outlined, '$totalLoaded lieux charges'),
-                _badge(Icons.swipe_down_alt_outlined, 'Tirer pour rafraichir'),
-                if (isAdmin)
-                  _badge(Icons.admin_panel_settings_outlined, 'Mode admin'),
-              ],
-            ),
+            if (isAdmin) ...[
+              const SizedBox(height: 12),
+              const Text(
+                'Mode admin actif',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _badge(IconData icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: 14),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 11.5,
-                fontWeight: FontWeight.w600),
-          ),
-        ],
       ),
     );
   }
