@@ -53,6 +53,7 @@ class TacoMapApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'TacoMap France',
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.theme(),
       home: const AuthGate(),
     );

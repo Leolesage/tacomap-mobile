@@ -18,15 +18,15 @@ flutter pub get
 
 ## Configuration API
 1. Copier `.env.example` (reference des variables attendues).
-2. Lancer avec `--dart-define`:
+2. Lancer avec `--dart-define` (optionnel si vous gardez la valeur par defaut):
 ```bash
-flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8001
+flutter run --dart-define=API_BASE_URL=http://10.176.130.138:8001
 ```
 
 Notes:
 - Android emulator: `http://10.0.2.2:8001`
 - iOS simulator: `http://localhost:8001`
-- Device physique: IP LAN de votre machine (ex: `http://192.168.1.10:8001`)
+- Device physique: IP LAN de votre machine (ex: `http://10.176.130.138:8001`)
 
 ## Identifiants demo
 - Email: `admin@tacomap.local`
