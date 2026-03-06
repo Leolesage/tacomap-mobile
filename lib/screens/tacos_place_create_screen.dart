@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -122,7 +124,12 @@ class _TacosPlaceCreateScreenState extends State<TacosPlaceCreateScreen> {
 
   Future<void> _pickPhotoFromSource(ImageSource source) async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: source, imageQuality: 85);
+    final image = await picker.pickImage(
+      source: source,
+      imageQuality: 70,
+      maxWidth: 1600,
+      maxHeight: 1600,
+    );
     if (image != null) {
       setState(() {
         _photo = image;
@@ -151,6 +158,14 @@ class _TacosPlaceCreateScreenState extends State<TacosPlaceCreateScreen> {
     if (_photo == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a photo.')),
+      );
+      return;
+    }
+    final photoSize = await File(_photo!.path).length();
+    if (photoSize > 3 * 1024 * 1024) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Photo too large (max 3 MB).')),
       );
       return;
     }

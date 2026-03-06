@@ -76,7 +76,24 @@ class TacosPlaceService {
       final data = jsonDecode(body) as Map<String, dynamic>;
       return TacosPlace.fromJson(data);
     }
+    String message = 'Create failed (${res.statusCode}).';
+    try {
+      final payload = jsonDecode(body);
+      if (payload is Map<String, dynamic>) {
+        final fields = payload['fields'];
+        if (fields is Map) {
+          final errors = fields.entries
+              .map((e) => '${e.key}: ${e.value}')
+              .join(', ');
+          if (errors.isNotEmpty) {
+            message = 'Create failed (${res.statusCode}) - $errors';
+          }
+        } else if (payload['error'] != null) {
+          message = 'Create failed (${res.statusCode}) - ${payload['error']}';
+        }
+      }
+    } catch (_) {}
 
-    throw ApiException('Create failed (${res.statusCode}).', statusCode: res.statusCode);
+    throw ApiException(message, statusCode: res.statusCode);
   }
 }
