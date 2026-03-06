@@ -67,6 +67,17 @@ class _TacosPlacesListScreenState extends State<TacosPlacesListScreen> {
     }
   }
 
+  Future<void> _openLogin() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+    );
+    if (!mounted) return;
+    if (context.read<AuthProvider>().isAuthenticated) {
+      context.read<TacosPlacesProvider>().refresh();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,6 +94,12 @@ class _TacosPlacesListScreenState extends State<TacosPlacesListScreen> {
                   icon: const Icon(Icons.logout_rounded),
                 );
               },
+            ),
+          if (!widget.isAdmin)
+            IconButton(
+              tooltip: 'Connexion admin',
+              onPressed: _openLogin,
+              icon: const Icon(Icons.admin_panel_settings_outlined),
             ),
         ],
       ),

@@ -8,7 +8,6 @@ import 'services/tacos_place_service.dart';
 import 'services/location_service.dart';
 import 'state/auth_provider.dart';
 import 'state/tacos_places_provider.dart';
-import 'screens/login_screen.dart';
 import 'screens/tacos_places_list_screen.dart';
 import 'widgets/app_loader.dart';
 
@@ -88,72 +87,14 @@ class _AuthGateState extends State<AuthGate> {
   }
 }
 
-class HomeShell extends StatefulWidget {
+class HomeShell extends StatelessWidget {
   const HomeShell({super.key});
-
-  @override
-  State<HomeShell> createState() => _HomeShellState();
-}
-
-class _HomeShellState extends State<HomeShell> {
-  int _index = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    final pages = <Widget>[
-      const TacosPlacesListScreen(isAdmin: false),
-      const AdminGateScreen(),
-    ];
-
-    return Scaffold(
-      body: IndexedStack(index: _index, children: pages),
-      bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 22,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: NavigationBar(
-            selectedIndex: _index,
-            onDestinationSelected: (i) => setState(() => _index = i),
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.lunch_dining_outlined),
-                selectedIcon: Icon(Icons.lunch_dining),
-                label: 'Tacos',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.admin_panel_settings_outlined),
-                selectedIcon: Icon(Icons.admin_panel_settings),
-                label: 'Admin',
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class AdminGateScreen extends StatelessWidget {
-  const AdminGateScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
-        if (!auth.isAuthenticated) {
-          return const LoginScreen(popOnSuccess: false);
-        }
-        return const TacosPlacesListScreen(isAdmin: true);
+        return TacosPlacesListScreen(isAdmin: auth.isAdmin);
       },
     );
   }

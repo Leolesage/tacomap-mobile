@@ -3,6 +3,8 @@ import '../services/auth_service.dart';
 import '../services/token_storage.dart';
 import '../services/api_client.dart';
 
+enum AppRole { user, admin }
+
 class AuthProvider extends ChangeNotifier {
   final TokenStorage tokenStorage;
   final AuthService authService;
@@ -25,6 +27,8 @@ class AuthProvider extends ChangeNotifier {
 
   bool get isInitialized => _initialized;
   bool get isAuthenticated => _isAuthenticated;
+  AppRole get role => _isAuthenticated ? AppRole.admin : AppRole.user;
+  bool get isAdmin => role == AppRole.admin;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
