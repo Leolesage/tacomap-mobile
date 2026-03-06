@@ -34,6 +34,17 @@ class _TacosPlaceCreateScreenState extends State<TacosPlaceCreateScreen> {
   bool _hasLocation = false;
   LatLng _deviceLatLng = const LatLng(48.8566, 2.3522);
 
+  void _setSelectedLocation(LatLng location, {bool moveMap = false}) {
+    _deviceLatLng = location;
+    _latitudeController.text = _deviceLatLng.latitude.toStringAsFixed(7);
+    _longitudeController.text = _deviceLatLng.longitude.toStringAsFixed(7);
+    _hasLocation = true;
+
+    if (moveMap) {
+      _mapController.move(_deviceLatLng, 13);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -91,11 +102,10 @@ class _TacosPlaceCreateScreenState extends State<TacosPlaceCreateScreen> {
     final locationService = context.read<LocationService>();
     try {
       final position = await locationService.getCurrentPosition();
-      _deviceLatLng = LatLng(position.latitude, position.longitude);
-      _latitudeController.text = _deviceLatLng.latitude.toStringAsFixed(7);
-      _longitudeController.text = _deviceLatLng.longitude.toStringAsFixed(7);
-      _mapController.move(_deviceLatLng, 13);
-      _hasLocation = true;
+      final location = LatLng(position.latitude, position.longitude);
+      if (mounted) {
+        setState(() => _setSelectedLocation(location, moveMap: true));
+      }
     } catch (e) {
       _hasLocation = false;
       if (mounted) {
@@ -110,15 +120,19 @@ class _TacosPlaceCreateScreenState extends State<TacosPlaceCreateScreen> {
     }
   }
 
-  Future<void> _pickPhoto() async {
+  Future<void> _pickPhotoFromSource(ImageSource source) async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+    final image = await picker.pickImage(source: source, imageQuality: 85);
     if (image != null) {
       setState(() {
         _photo = image;
       });
     }
   }
+
+  Future<void> _takePhoto() => _pickPhotoFromSource(ImageSource.camera);
+
+  Future<void> _pickPhoto() => _pickPhotoFromSource(ImageSource.gallery);
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -130,7 +144,7 @@ class _TacosPlaceCreateScreenState extends State<TacosPlaceCreateScreen> {
     }
     if (!_hasLocation) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Device geolocation is required.')),
+        const SnackBar(content: Text('Please select a location on the map.')),
       );
       return;
     }
@@ -273,7 +287,7 @@ class _TacosPlaceCreateScreenState extends State<TacosPlaceCreateScreen> {
                 ),
               ]),
               const SizedBox(height: 20),
-              _sectionLabel('DEVICE LOCATION'),
+              _sectionLabel('LOCATION'),
               const SizedBox(height: 10),
               _formCard([
                 Row(
@@ -319,6 +333,9 @@ class _TacosPlaceCreateScreenState extends State<TacosPlaceCreateScreen> {
                       options: MapOptions(
                         initialCenter: _deviceLatLng,
                         initialZoom: 13,
+                        onTap: (_, point) {
+                          setState(() => _setSelectedLocation(point));
+                        },
                       ),
                       children: [
                         TileLayer(
@@ -344,7 +361,7 @@ class _TacosPlaceCreateScreenState extends State<TacosPlaceCreateScreen> {
                 Text(
                   _isLoadingLocation
                       ? 'Retrieving device location...'
-                      : 'Latitude and longitude come from the device location.',
+                      : 'Tap on the map to set latitude and longitude.',
                   style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
                 ),
                 const SizedBox(height: 12),
@@ -383,16 +400,63 @@ class _TacosPlaceCreateScreenState extends State<TacosPlaceCreateScreen> {
               _sectionLabel('PHOTO'),
               const SizedBox(height: 10),
               _formCard([
-                OutlinedButton.icon(
-                  onPressed: _pickPhoto,
-                  icon: const Icon(Icons.photo_library_outlined, size: 16),
-                  label: Text(_photo == null ? 'Select a photo' : 'Photo selected'),
-                  style: _photo != null
-                      ? OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.success,
-                          side: const BorderSide(color: AppTheme.success, width: 1.5),
-                        )
-                      : null,
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _takePhoto,
+                        icon: const Icon(Icons.photo_camera_outlined, size: 16),
+                        label: const Text('Take photo'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _pickPhoto,
+                        icon: const Icon(Icons.photo_library_outlined, size: 16),
+                        label: const Text('Gallery'),
+                      ),
+                    ),
+                  ],
+                ),
+                if (_photo != null) ...[
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Photo selected.',
+                    style: TextStyle(
+                      color: AppTheme.success,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+                if (_photo == null) ...[
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Take a photo or pick one from gallery.',
+                    style: TextStyle(
+                      color: AppTheme.textMuted,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ]),
+              const SizedBox(height: 12),
+              _formCard([
+                const Row(
+                  children: [
+                    Icon(Icons.info_outline, size: 16, color: AppTheme.textMuted),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Native components used: Camera + Device geolocation.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textMuted,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ]),
               const SizedBox(height: 28),

@@ -1,5 +1,8 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import '../config/api_config.dart';
 import '../services/tacos_place_service.dart';
 import '../models/tacos_place.dart';
 import '../widgets/app_loader.dart';
@@ -65,6 +68,13 @@ class TacosPlaceDetailScreen extends StatelessWidget {
                     item.latitude.toString()),
                 _infoTile(Icons.pin_drop_rounded, 'Longitude',
                     item.longitude.toString()),
+                const SizedBox(height: 16),
+                _groupTitle('Carte'),
+                const SizedBox(height: 10),
+                _LocationMap(
+                  latitude: item.latitude,
+                  longitude: item.longitude,
+                ),
                 const SizedBox(height: 16),
                 _groupTitle('Contact'),
                 const SizedBox(height: 10),
@@ -148,6 +158,73 @@ class TacosPlaceDetailScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _LocationMap extends StatelessWidget {
+  final double latitude;
+  final double longitude;
+
+  const _LocationMap({required this.latitude, required this.longitude});
+
+  @override
+  Widget build(BuildContext context) {
+    final isValid = latitude >= -90 &&
+        latitude <= 90 &&
+        longitude >= -180 &&
+        longitude <= 180;
+
+    if (!isValid) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppTheme.border),
+        ),
+        child: const Text(
+          'Coordonnees invalides.',
+          style: TextStyle(color: AppTheme.textMuted),
+        ),
+      );
+    }
+
+    final center = LatLng(latitude, longitude);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: SizedBox(
+        height: 220,
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: center,
+            initialZoom: 13,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: '${ApiConfig.baseUrl}/tiles/{z}/{x}/{y}',
+              maxZoom: 19,
+              userAgentPackageName: 'com.example.tacomap_mobile',
+            ),
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: center,
+                  width: 40,
+                  height: 40,
+                  child: const Icon(
+                    Icons.location_pin,
+                    color: Colors.red,
+                    size: 40,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
