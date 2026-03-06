@@ -47,5 +47,9 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>TacoMap uses your location to fill latitude and longitude when creating a TacosPlace.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>TacoMap needs camera access to take a photo for a TacosPlace.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>TacoMap needs photo library access to choose a photo for a TacosPlace.</string>
 </dict>
 </plist>
